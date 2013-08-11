@@ -1,0 +1,52 @@
+\name{bindcount}
+\alias{bindcount}
+\title{Compute the number of reads overlapping the specified positions for the whole genome.}
+\usage{
+  bindcount(chipdat, inputdat, bindpos, fragL = 200,
+    whs = 250)
+}
+\arguments{
+  \item{chipdat}{A \link{list} of the starting coordinates
+  for aligned reads for all chromosomes, with positive
+  numbers representing the 5' strand and negative numbers
+  representing the 3' strand.}
+
+  \item{inputdat}{A \link{list} of the starting coordinates
+  for aligned reads for the input sample for all
+  chromosomes, with positive numbers representing the 5'
+  strand and negative numbers representing the 3' strand.}
+
+  \item{bindpos}{A \link{list} of genome coordinates for
+  each chromosome whose numbers of covering tags are
+  computed.}
+
+  \item{fragL}{A \link{numeric} value for the fragment
+  length of the aligned reads. Default: 200.}
+
+  \item{whs}{A \link{numeric} value for the half window
+  size around the binding position. All tags overlapping
+  this region are counted. Default: 250.}
+}
+\value{
+  A \link{list} of the number of overlapping tags for all
+  position. Each list is a data.frame corresponding to a
+  single chromosome, containing:
+
+  \tabular{ll}{ chip \tab The number of ChIP sample reads
+  overlapping each position.\cr input \tab The number of
+  input sample reads overlapping each position.\cr }
+}
+\description{
+  Compute the number of reads overlapping the specified
+  positions for the whole genome.
+}
+\examples{
+data( tagdat_input )
+data( tagdat_chip )
+data( bindpos )
+bindcount( tagdat_chip, tagdat_input, bindpos, fragL = 100, whs = 300 )
+}
+\author{
+  Chandler Zuo \email{zuo@stat.wisc.edu}
+}
+

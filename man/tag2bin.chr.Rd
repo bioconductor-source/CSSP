@@ -1,0 +1,33 @@
+\name{tag2bin.chr}
+\alias{tag2bin.chr}
+\title{Convert the genome coordinates of aligned reads to bin-level counting data for a single chromosome.}
+\usage{
+  tag2bin.chr(tagdat, fragL = 200, binS = 200)
+}
+\arguments{
+  \item{tagdat}{A \link{numeric} vector of genome
+  coordinates for the starting positions of the aligned
+  reads, with positive numbers representing the 5' strand
+  and negative numbers representing the 3' strand.}
+
+  \item{fragL}{A \link{numeric} value of the fragment
+  length for the reads. Default: 200.}
+
+  \item{binS}{A \link{numeric} value of the bin-size for
+  the bin-level data to be constructed. Default: 200.}
+}
+\value{
+  A \link{numeric} vector of the counts for each bin.
+}
+\description{
+  Convert the genome coordinates of aligned reads to
+  bin-level counting data for a single chromosome.
+}
+\examples{
+data( tagdat_chip )
+tag2bin.chr( tagdat_chip[[1]], fragL = 100, binS = 100 )
+}
+\author{
+  Chandler Zuo \email{zuo@stat.wisc.edu}
+}
+

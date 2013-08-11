@@ -1,0 +1,140 @@
+\name{createBinData}
+\alias{createBinData}
+\title{Create a BinData object by merging lists of ChIP and input bin data with external M and GC text files.}
+\usage{
+  createBinData(dat.chip, dat.input, mfile, gcfile, nfile,
+    m.suffix = NULL, gc.suffix = NULL, n.suffix = NULL,
+    chrlist = NULL, dataType = "unique")
+}
+\arguments{
+  \item{dat.chip}{A \link{list} of the ChIP bin level data
+  for each chromosome.}
+
+  \item{dat.input}{A \link{list} of the input bin level
+  data for each chromosome.}
+
+  \item{chrlist}{A \link{list} of the chromosomes that is
+  imported. If "NULL", all chromosomes specified by
+  "name(dat.chip)" are imported.}
+
+  \item{mfile}{A \link{character} value. If
+  "m.suffix=NULL", this is the file name of the genome-wide
+  M file. Otherwise, this is the common prefix (including
+  relative path) for all chromosome-level M files.}
+
+  \item{gcfile}{A \link{character} value. If
+  "gc.suffix=NULL", this is the file name of the
+  genome-wide GC file. Otherwise, this is the common prefix
+  (including relative path) for all chromosome-level GC
+  files.}
+
+  \item{nfile}{A \link{character} value. If
+  "n.suffix=NULL", this is the file name of the genome-wide
+  N file. Otherwise, this is the common prefix (including
+  relative path) for all chromosome-level N files.}
+
+  \item{m.suffix}{A \link{character} value. If not NULL,
+  this is the suffix of the chromosome-wise M files. The
+  chromosome-level file has to be named "chrX_m.suffix".}
+
+  \item{gc.suffix}{A \link{character} value. If not NULL,
+  this is the suffix of the chromosome-wise GC files. The
+  chromosome-level file has to be named "chrX_gc.suffix".}
+
+  \item{n.suffix}{A \link{character} value. If not NULL,
+  this is the suffix of the chromosome-wise N files. The
+  chromosome-level file has to be named "chrX_n.suffix".}
+
+  \item{dataType}{A \link{character} value of either
+  "unique" or "multi".}
+}
+\value{
+  A \link{BinData-class} object.
+}
+\description{
+  This function create a BinData object by merging ChIP and
+  input bin-level counts with external M/GC/N text files.
+}
+\note{
+  When .suffix is null, the corresponding genome-wise file
+  must have three columns, with the first column being the
+  chromosome names, the second column being the genome
+  coordinates, and the third column being the corresponding
+  scores. In contrast, when .suffix is not null, then each
+  chromosome-level M/GC/N file should only contain two
+  columns, with the first column being the genome
+  coordinates and the second column being the scores.
+}
+\examples{
+data(tagdat_chip)
+data(tagdat_input)
+dat_chip <- tag2bin(tagdat_chip,binS=100,fragL=100)
+dat_input <- tag2bin(tagdat_input,binS=100,fragL=100)
+
+numBins <- as.integer(runif(5,190,220))
+mapdat <- gcdat <- ndat <- list(1:5)
+allmapdat <- allgcdat <- allndat <- NULL
+for(i in 1:5){
+  mapdat[[i]] <- data.frame(
+                            pos=(0:(numBins[i]-1))*100,
+                            M=runif(numBins[i],0.9,1)
+                            )
+  gcdat[[i]] <- data.frame(
+                           pos=(0:(numBins[i]-1))*100,
+                           GC=runif(numBins[i],0.5,1)
+                           )
+  ndat[[i]] <- data.frame(
+                          pos=(0:(numBins[i]-1))*100,
+                          N=rbinom(numBins[i],1,0.01)
+                          )
+  allmapdat <- rbind(allmapdat,
+                     cbind(paste("chr",i,sep=""),mapdat[[i]]))
+  allgcdat <- rbind(allgcdat,
+                    cbind(paste("chr",i,sep=""),gcdat[[i]]))
+  allndat <- rbind(allndat,
+                   cbind(paste("chr",i,sep=""),ndat[[i]]))
+  
+  write.table( mapdat[[i]], file = paste("map_chr",i,".txt",sep=""),
+              sep = "\\t", row.names = FALSE, col.names = FALSE)
+  write.table( gcdat[[i]], file = paste("gc_chr",i,".txt",sep=""),
+              sep = "\\t", row.names = FALSE, col.names = FALSE)
+  write.table( ndat[[i]], file = paste("n_chr",i,".txt",sep=""),
+              sep = "\\t", row.names = FALSE, col.names = FALSE)
+}
+write.table( allmapdat, file = "allmap.txt" , sep = "\\t", row.names = FALSE,
+            col.names = FALSE )
+write.table( allgcdat,file = "allgc.txt" , sep = "\\t", row.names = FALSE,
+            col.names = FALSE )
+write.table( allndat,file = "alln.txt", sep = "\\t", row.names = FALSE,
+            col.names = FALSE )
+
+bindata1 <- createBinData( dat_chip, dat_input, mfile = "map_",
+                          gcfile = "gc_", nfile = "n_", m.suffix = ".txt",
+                          gc.suffix = ".txt", n.suffix = ".txt",
+                          chrlist = NULL, dataType = "unique" )
+bindata2 <- createBinData( dat_chip, dat_input, mfile = "allmap.txt",
+                          gcfile="gc_", nfile = "n_", m.suffix = NULL,
+                          gc.suffix = ".txt", n.suffix = ".txt",
+                          chrlist = NULL, dataType = "unique" )
+bindata3 <- createBinData( dat_chip, dat_input, mfile = "map_",
+                          gcfile = "allgc.txt", nfile="n_", m.suffix = ".txt",
+                          gc.suffix = NULL, n.suffix = ".txt",
+                          chrlist = NULL, dataType = "unique")
+bindata4 <- createBinData( dat_chip, dat_input, mfile = "map_",
+                          gcfile = "gc_", nfile = "alln.txt", m.suffix = ".txt",
+                          gc.suffix = ".txt", n.suffix = NULL,
+                          chrlist = NULL, dataType = "unique")
+
+for(i in 1:5){
+  for(j in c("map_","gc_","n_")){
+    file.remove(paste(j,"chr",i,".txt",sep=""))
+  }
+}
+file.remove("allmap.txt")
+file.remove("alln.txt")
+file.remove("allgc.txt")
+}
+\author{
+  Chandler Zuo \email{zuo@stat.wisc.edu}
+}
+

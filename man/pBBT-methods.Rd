@@ -1,0 +1,35 @@
+\docType{methods}
+\name{pBBT}
+\alias{pBBT}
+\alias{pBBT,CSSPFit-method}
+\title{Compute the cumulative probability of the bin-level poisson parameters.}
+\arguments{
+  \item{fit}{A \link{CSSPFit-class} object for the CSSP
+  model.}
+
+  \item{x}{A \link{numeric} value for the percentile level
+  of bin-level poisson parameters.}
+
+  \item{depth}{A \link{numeric} value for the sequencing
+  depth at which the probability is estimated.}
+
+  \item{lower}{A \link{logical} value. If TRUE, the lower
+  quantile is computed. If FALSE (Default), the upper
+  quantile is computed.}
+}
+\value{
+  A \link{numeric} value for the cumulative distribution of
+  bin-level poisson parameters.
+}
+\description{
+  Compute the cumulative probability of the bin-level
+  poisson parameters.
+}
+\examples{
+data( sampleFit )
+pBBT( sampleFit, x = 10 )
+}
+\author{
+  Chandler Zuo \email{zuo@stat.wisc.edu}
+}
+

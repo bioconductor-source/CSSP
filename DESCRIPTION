@@ -1,0 +1,15 @@
+Package: CSSP
+Type: Package
+Title: ChIP-Seq Statistical Power
+Version: 0.99.4
+Date: 2013-08-11
+biocViews: ChIPseq, HighThroughputSequencing, QualityControl
+Author: Chandler Zuo, Sunduz Keles
+Maintainer: Chandler Zuo<zuo@stat.wisc.edu>
+Description: Power computation for ChIP-Seq data based on Bayesian estimation
+    for local poisson counting process.
+License: GPL-2
+Imports: methods, splines, stats, utils
+Suggests: testthat
+Collate: 'base.R' 'fit_model.R' 'post_model.R' 'power.R'
+        'process_bin.R'
