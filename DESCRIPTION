@@ -1,7 +1,7 @@
 Package: CSSP
 Type: Package
 Title: ChIP-Seq Statistical Power
-Version: 0.99.4
+Version: 1.0.0
 Date: 2013-08-11
 biocViews: ChIPseq, HighThroughputSequencing, QualityControl
 Author: Chandler Zuo, Sunduz Keles
