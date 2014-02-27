@@ -3,6 +3,11 @@
 \alias{qBBT}
 \alias{qBBT,CSSPFit-method}
 \title{Compute the quantile estimate for the bin-level poisson parameters.}
+\usage{
+qBBT(fit, prob, depth = fit@lambday, lower = FALSE)
+
+\S4method{qBBT}{CSSPFit}(fit, prob, depth = fit@lambday, lower = FALSE)
+}
 \arguments{
   \item{fit}{A \link{CSSPFit-class} object for the CSSP
   model.}
@@ -18,18 +23,18 @@
   quantile is computed.}
 }
 \value{
-  A \link{numeric} value for the percentile of bin-level
-  poisson parameters.
+A \link{numeric} value for the percentile of bin-level
+poisson parameters.
 }
 \description{
-  Compute the quantile estimate for the bin-level poisson
-  parameters.
+Compute the quantile estimate for the bin-level poisson
+parameters.
 }
 \examples{
 data( sampleFit )
 qBBT( sampleFit, prob = 0.99, depth = sampleFit@lambday*0.1 )
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

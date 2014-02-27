@@ -115,7 +115,8 @@ bindcount <- function(chipdat,inputdat,bindpos,fragL=200,whs=250)
 #'@param chipdat A \link{list} of the starting positions of the ChIP sample aligned reads for each chromosome. The sign of each coordinate represents its strand direction, with a positive numbers on the 5' strand and a negative numbers on the 3' strand.
 #'@param inputdat A \link{list} of the starting positions of the input sample aligned reads for each chromosome. The sign of each coordinate represents its strand direction, with a positive numbers on the 5' strand and a negative numbers on the 3' strand.
 #'@param peakpos A \link{list} containing the genome coordinates for each peak interval on each chromosome. Each list component is a 2-column matrix containing the left and right boundary of the peak intervals on one chromosome.
-#'@param fragL A \link{numeric} valkue of the fragment length of the aligned reads. Default: 200.
+#'@param fragL A \link{numeric} value of the fragment length of the aligned reads. Default: 200.
+#'@param unique A \link{logical} value for whether only reads mapping to unique nucleotide positions are counted.
 #'@return A \link{list} of the numbers of reads that overlap the corresponding peak intervals. 
 #'@author Chandler Zuo \email{zuo@@stat.wisc.edu}
 #'@examples
@@ -124,20 +125,20 @@ bindcount <- function(chipdat,inputdat,bindpos,fragL=200,whs=250)
 #'data( tagdat_chip )
 #'peakcount( tagdat_chip, tagdat_input, peakpos, fragL = 100 )
 #'@export
-peakcount <- function(chipdat,inputdat,peakpos,fragL=200)
+peakcount <- function(chipdat,inputdat,peakpos,fragL=200,unique=FALSE)
   {
     bindCount <- NULL
     for(i in names(peakpos))
       {
         if(!is.null(chipdat[[i]]))
           {
-            bindCount[[i]]$chip <- peakcount.chr(chipdat[[i]],peakpos[[i]],fragL=fragL)
+            bindCount[[i]]$chip <- peakcount.chr(chipdat[[i]],peakpos[[i]],fragL=fragL,unique=unique)
           }else{
             bindCount[[i]]$chip <- NULL
           }
         if(!is.null(inputdat[[i]]))
           {
-            bindCount[[i]]$input <- peakcount.chr(inputdat[[i]],peakpos[[i]],fragL=fragL)
+            bindCount[[i]]$input <- peakcount.chr(inputdat[[i]],peakpos[[i]],fragL=fragL,unique=unique)
           }else{
             bindCount[[i]]$input <- NULL
           }
@@ -151,6 +152,7 @@ peakcount <- function(chipdat,inputdat,peakpos,fragL=200)
 #'@param tagdat A \link{numeric} vector of the genome coordinates for the starting positions of aligned reads. The signs of coordinates represent their strand direction, with positive numbers representing the 5' strand and negative numbers representing the 3' strand.
 #'@param peakpos A 2-column \link{matrix} matrix containing the left and right position of the peaks for one chromosome.
 #'@param fragL A \link{numeric} value for the fragment length of the sequencing reads. Default: 200.
+#'@param unique A \link{logical} value for whether only reads mapping to unique nucleotide positions are counted.
 #'@return A \link{numeric} vector of the number of overlapping tags for all peaks. 
 #'@author Chandler Zuo \email{zuo@@stat.wisc.edu}
 #'@useDynLib CSSP
@@ -159,9 +161,12 @@ peakcount <- function(chipdat,inputdat,peakpos,fragL=200)
 #'data( tagdat_input )
 #'peakcount.chr( tagdat_input[[1]], peakpos[[1]], fragL = 100 )
 #'@export
-peakcount.chr <- function(tagdat,peakpos,fragL=200)
+peakcount.chr <- function(tagdat,peakpos,fragL=200,unique=FALSE)
   {
-      return(.Call("peakcount_c",as.numeric(tagdat),as.numeric(peakpos[,1]),as.numeric(peakpos[,2]),fragL,PACKAGE="CSSP"))
+      if( unique )
+          return(.Call("peakcount_uniq",as.numeric(tagdat),as.numeric(peakpos[,1]),as.numeric(peakpos[,2]),fragL,PACKAGE="CSSP"))
+      else
+          return(.Call("peakcount_c",as.numeric(tagdat),as.numeric(peakpos[,1]),as.numeric(peakpos[,2]),fragL,PACKAGE="CSSP"))
   }
 
 #'@name readBinFile
@@ -227,8 +232,8 @@ readBinFile <- function(type=c("chip","input","M","GC"),fileName)
 #'@title Create a BinData object by merging lists of ChIP and input bin data with external M and GC text files.
 #'
 #'@description This function create a BinData object by merging ChIP and input bin-level counts with external M/GC/N text files.
-#'@param dat.chip A \link{list} of the ChIP bin level data for each chromosome.
-#'@param dat.input A \link{list} of the input bin level data for each chromosome.
+#'@param dat.chip Either a \link{list} of the ChIP bin level data for each chromosome, or a \link{character} string of the file name including the ChIP bin level data. If the ChIP bin level file name is provided, the file must contain at least two columns, where the chromosome information is in the first column, and the bin level counts are in the last column.
+#'@param dat.input A \link{list} of the input bin level data for each chromosome, or a \link{character} string for the input bin level data counts. The structure is the same as "dat.chip".
 #'@param chrlist A \link{list} of the chromosomes that is imported. If "NULL", all chromosomes specified by "name(dat.chip)" are imported.
 #'@param mfile A \link{character} value. If "m.suffix=NULL", this is the file name of the genome-wide M file. Otherwise, this is the common prefix (including relative path) for all chromosome-level M files.
 #'@param gcfile A \link{character} value. If "gc.suffix=NULL", this is the file name of the genome-wide GC file. Otherwise, this is the common prefix (including relative path) for all chromosome-level GC files.
@@ -244,8 +249,23 @@ readBinFile <- function(type=c("chip","input","M","GC"),fileName)
 #'@export
 createBinData <- function(dat.chip,dat.input,mfile,gcfile,nfile,m.suffix=NULL,gc.suffix=NULL,n.suffix=NULL,chrlist=NULL,dataType="unique")  {
 
+  dataFrameToList <- function( indat ) {
+    chrlist <- unique( indat[,1] )
+    outdat <- as.list( seq_along( chrlist ) )
+    names( outdat ) <- chrlist
+    for( chr in chrlist ){
+      outdat[[ chr ]] <- indat[ indat[,1] == chr, ncol( indat ) ]
+    }
+    return( outdat )
+  }
+
+  if( class( dat.chip ) == "character" )
+    dat.chip <- dataFrameToList( read.table( dat.chip ) )
+
+  if( class( dat.input ) == "character" )
+    dat.input <- dataFrameToList( read.table( dat.input ) )
+  
   if(is.null(chrlist))chrlist <- as.character(names(dat.chip))
-    
 
   map <- gc <- nm <- NULL
     ##reading M files

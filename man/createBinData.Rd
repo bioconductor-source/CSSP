@@ -2,16 +2,23 @@
 \alias{createBinData}
 \title{Create a BinData object by merging lists of ChIP and input bin data with external M and GC text files.}
 \usage{
-  createBinData(dat.chip, dat.input, mfile, gcfile, nfile,
-    m.suffix = NULL, gc.suffix = NULL, n.suffix = NULL,
-    chrlist = NULL, dataType = "unique")
+createBinData(dat.chip, dat.input, mfile, gcfile, nfile, m.suffix = NULL,
+  gc.suffix = NULL, n.suffix = NULL, chrlist = NULL,
+  dataType = "unique")
 }
 \arguments{
-  \item{dat.chip}{A \link{list} of the ChIP bin level data
-  for each chromosome.}
+  \item{dat.chip}{Either a \link{list} of the ChIP bin
+  level data for each chromosome, or a \link{character}
+  string of the file name including the ChIP bin level
+  data. If the ChIP bin level file name is provided, the
+  file must contain at least two columns, where the
+  chromosome information is in the first column, and the
+  bin level counts are in the last column.}
 
   \item{dat.input}{A \link{list} of the input bin level
-  data for each chromosome.}
+  data for each chromosome, or a \link{character} string
+  for the input bin level data counts. The structure is the
+  same as "dat.chip".}
 
   \item{chrlist}{A \link{list} of the chromosomes that is
   imported. If "NULL", all chromosomes specified by
@@ -49,21 +56,21 @@
   "unique" or "multi".}
 }
 \value{
-  A \link{BinData-class} object.
+A \link{BinData-class} object.
 }
 \description{
-  This function create a BinData object by merging ChIP and
-  input bin-level counts with external M/GC/N text files.
+This function create a BinData object by merging ChIP and
+input bin-level counts with external M/GC/N text files.
 }
 \note{
-  When .suffix is null, the corresponding genome-wise file
-  must have three columns, with the first column being the
-  chromosome names, the second column being the genome
-  coordinates, and the third column being the corresponding
-  scores. In contrast, when .suffix is not null, then each
-  chromosome-level M/GC/N file should only contain two
-  columns, with the first column being the genome
-  coordinates and the second column being the scores.
+When .suffix is null, the corresponding genome-wise file
+must have three columns, with the first column being the
+chromosome names, the second column being the genome
+coordinates, and the third column being the corresponding
+scores. In contrast, when .suffix is not null, then each
+chromosome-level M/GC/N file should only contain two
+columns, with the first column being the genome coordinates
+and the second column being the scores.
 }
 \examples{
 data(tagdat_chip)
@@ -135,6 +142,6 @@ file.remove("alln.txt")
 file.remove("allgc.txt")
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

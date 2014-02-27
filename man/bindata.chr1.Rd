@@ -4,11 +4,10 @@
 \title{An artificially constructed data.frame object that can be used by cssp.fit function.}
 \format{a \link{data.frame} class object.}
 \description{
-  This data set contains a typical example for a data.frame
-  object that can be imported by \link{cssp.fit}.
+This data set contains a typical example for a data.frame
+object that can be imported by \link{cssp.fit}.
 }
 \author{
-  Chandler Zuo zuo@stat.wisc.edu
+Chandler Zuo zuo@stat.wisc.edu
 }
-\keyword{datasets}
 

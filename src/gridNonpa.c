@@ -3,15 +3,15 @@
 #include <Rmath.h>
 #include <time.h>
 
-SEXP gridMGCmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
+SEXP gridMGCnonpa_c(SEXP x,SEXP y, SEXP map, SEXP gc,SEXP ngrid)
 {
 
-  double *M=REAL(map),*GC=REAL(gc), *Y=REAL(y);
+	double *M=REAL(map),*GC=REAL(gc), *X=REAL(x), *Y=REAL(y);
   R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[4],n=length(map),newG,counter;
 
   double Mgrid_l[ng+10],GCgrid_l[ng+10],Ngrid[ng+10],Mgrid_u[ng+10],GCgrid_u[ng+10];
   SEXP res;
-  PROTECT(res=allocVector(REALSXP,4*ng+50));
+  PROTECT(res=allocVector(REALSXP,8*ng+n+50));
   
   Mgrid_l[0]=-0.001;
   Mgrid_u[0]=1;
@@ -148,22 +148,38 @@ SEXP gridMGCmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
   REAL(res)[0]=k;
   for(i=0;i<k;i++)
     {
-      REAL(res)[1+4*i]=0;
-      REAL(res)[2+4*i]=0;
-      REAL(res)[3+4*i]=0;
-      REAL(res)[4+4*i]=Ngrid[i];
+      REAL(res)[1+8*i]=0;
+      REAL(res)[2+8*i]=0;
+      REAL(res)[3+8*i]=0;
+      REAL(res)[4+8*i]=0;
+      REAL(res)[5+8*i]=0;
+      REAL(res)[6+8*i]=0;//number of zero obs of input
+      REAL(res)[8+8*i]=Ngrid[i];//number of non-zero obs of input
+      REAL(res)[7+8*i]=0;//number of zero obs of chip
       for(j=0;j<n;j++)
 	{
 	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i] & GC[j]>GCgrid_l[i] & GC[j]<=GCgrid_u[i])
 	    {
-		    REAL(res)[1+4*i]+=Y[j];
-	      REAL(res)[2+4*i]+=M[j];
-	      REAL(res)[3+4*i]+=GC[j];
+		    REAL(res)[j+8*k+1]=i+1;
+
+		    REAL(res)[1+8*i]+=X[j];
+		    REAL(res)[2+8*i]+=X[j]*X[j];
+		    REAL(res)[3+8*i]+=X[j]*X[j]*X[j];
+		    REAL(res)[4+8*i]+=M[j];
+		    REAL(res)[5+8*i]+=GC[j];
+		    if( X[j] < 1 )
+			    REAL(res)[6+8*i] ++;
+		    if( Y[j] < 1 )
+			    REAL(res)[7+8*i] ++;
 	    }
 	}
-      REAL(res)[1+4*i] /= Ngrid[i];
-      REAL(res)[2+4*i]/=Ngrid[i];
-      REAL(res)[3+4*i]/=Ngrid[i];
+      //first moment
+      REAL(res)[1+8*i] /= Ngrid[i];
+      //second moment
+      REAL(res)[2+8*i] /= Ngrid[i];
+      REAL(res)[3+8*i] /= Ngrid[i];
+      REAL(res)[4+8*i] /= Ngrid[i];
+      REAL(res)[5+8*i] /= Ngrid[i];
     }
 
   UNPROTECT(1);
@@ -171,14 +187,14 @@ SEXP gridMGCmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 
 }
 
-SEXP gridMmean_c(SEXP y, SEXP map,SEXP ngrid)
+SEXP gridMnonpa_c(SEXP x, SEXP y, SEXP map,SEXP ngrid)
 {
-  double *M=REAL(map), *Y=REAL(y);
-  R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[2],n=length(map),newG,counter;
-  
-  double Mgrid_l[ng+10],Ngrid[ng+10],Mgrid_u[ng+10];
-  SEXP res;
-  PROTECT(res=allocVector(REALSXP,3*ng+30));
+	double *M=REAL(map), *X=REAL(x), *Y=REAL(y);
+	R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[2],n=length(map),newG,counter;
+	
+	double Mgrid_l[ng+10],Ngrid[ng+10],Mgrid_u[ng+10];
+	SEXP res;
+  PROTECT(res=allocVector(REALSXP,7*ng+n+30));
   
   Mgrid_l[0]=-0.001;
   Mgrid_u[0]=1;
@@ -287,19 +303,32 @@ SEXP gridMmean_c(SEXP y, SEXP map,SEXP ngrid)
   REAL(res)[0]=k;
   for(i=0;i<k;i++)
     {
-      REAL(res)[1+3*i]=0;
-      REAL(res)[2+3*i]=0;
-      REAL(res)[3+3*i]=Ngrid[i];
+      REAL(res)[1+7*i]=0;
+      REAL(res)[2+7*i]=0;
+      REAL(res)[3+7*i]=0;
+      REAL(res)[4+7*i]=0;
+      REAL(res)[7+7*i]=Ngrid[i];
+      REAL(res)[5+7*i]=0;
+      REAL(res)[6+7*i]=0;
       for(j=0;j<n;j++)
 	{
 	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i])
 	    {
-		    REAL(res)[1+3*i]+=Y[j];
-	      REAL(res)[2+3*i]+=M[j];
+		    REAL(res)[j+7*k+1]=i+1;
+		    REAL(res)[1+7*i]+=X[j];
+		    REAL(res)[2+7*i]+=X[j]*X[j];
+		    REAL(res)[3+7*i]+=X[j]*X[j]*X[j];
+		    REAL(res)[4+7*i]+=M[j];
+		    if( X[j] < 1 )
+			    REAL(res)[5+7*i]++;
+		    if( Y[j] < 1 )
+			    REAL(res)[6+7*i]++;
 	    }
 	}
-      REAL(res)[1+3*i] /= Ngrid[ i ];
-      REAL(res)[2+3*i]/=Ngrid[i];
+      REAL(res)[1+7*i] /= Ngrid[ i ];
+      REAL(res)[2+7*i] /= Ngrid[i];
+      REAL(res)[3+7*i] /= Ngrid[i];
+      REAL(res)[4+7*i] /= Ngrid[i];
     }
 
   UNPROTECT(1);

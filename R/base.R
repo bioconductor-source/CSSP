@@ -12,8 +12,10 @@
 #'\item{a}{The size parameter of the input sample model.}
 #'\item{b}{The size parameter of the background model for the ChIP sample.}
 #'\item{p.sig}{The vector of the proportions of enrichment as each signal component across all enrichment bins.}
+#'\item{prob.zero}{The vector of the prior inflated probability at 0.}
 #'\item{post.p.sig}{The matrix for the posterior probability of each bin being enriched as a signal component conditioning on the event that the bin is enriched. Each column corresponds to one signal component.}
 #'\item{post.p.bind}{Posterior probability of each bin being enriched.}
+#'\item{post.p.zero}{Posterior probability of the inflated probability at 0.}
 #'\item{post.shape.sig}{The matrix for the shape parameters for the posterior gamma distributions of bin level poisson parameters, conditioning on the event that the bins are enriched as each signal component. Each column corresponds to one signal component.}
 #'\item{post.scale.sig}{The matrix for the scale parameters of the posterior gamma distributions of bin level poisson parameters, conditioning on the event that the bins are enriched as each signal component. Each column corresponds to one signal component.}
 #'\item{post.shape.back}{The shape parameters for the posterior gamma distributions of bin level poisson parameters, conditioning on each bin being enriched.}
@@ -22,6 +24,7 @@
 #'\item{k}{The number of signal components.}
 #'\item{map.id}{The indices for the mappable bins that are fitted by the model.}
 #'\item{pvalue}{The continuously corrected p-values for a subset of ChIP sample bin counts against the background model.}
+#'\item{cum.pval}{The cumulative distribution for p-values for a subset of ChIP sample bin counts against the background model.}
 #'}
 #'
 #'@examples showClass("CSSPFit")
@@ -41,8 +44,10 @@ setClass("CSSPFit",
            mean.sig="numeric",
            size.sig="numeric",
            p.sig="numeric",
+           prob.zero="numeric",
            post.p.sig="matrix",
            post.p.bind="numeric",
+           post.p.zero="numeric",
            post.shape.sig="matrix",
            post.shape.back="numeric",
            post.scale.sig="matrix",
@@ -50,7 +55,8 @@ setClass("CSSPFit",
            n="numeric",
            k="numeric",
            map.id="numeric",
-           pvalue="numeric"
+           pvalue="numeric",
+           cum.pval="numeric"
            )
          )
 

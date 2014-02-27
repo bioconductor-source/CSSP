@@ -2,7 +2,7 @@
 \alias{peakcount}
 \title{Compute the number of aligned reads overlapping the specified peak intervals for the whole genome.}
 \usage{
-  peakcount(chipdat, inputdat, peakpos, fragL = 200)
+peakcount(chipdat, inputdat, peakpos, fragL = 200, unique = FALSE)
 }
 \arguments{
   \item{chipdat}{A \link{list} of the starting positions of
@@ -23,16 +23,20 @@
   left and right boundary of the peak intervals on one
   chromosome.}
 
-  \item{fragL}{A \link{numeric} valkue of the fragment
+  \item{fragL}{A \link{numeric} value of the fragment
   length of the aligned reads. Default: 200.}
+
+  \item{unique}{A \link{logical} value for whether only
+  reads mapping to unique nucleotide positions are
+  counted.}
 }
 \value{
-  A \link{list} of the numbers of reads that overlap the
-  corresponding peak intervals.
+A \link{list} of the numbers of reads that overlap the
+corresponding peak intervals.
 }
 \description{
-  Compute the number of aligned reads overlapping the
-  specified peak intervals for the whole genome.
+Compute the number of aligned reads overlapping the
+specified peak intervals for the whole genome.
 }
 \examples{
 data( peakpos )
@@ -41,6 +45,6 @@ data( tagdat_chip )
 peakcount( tagdat_chip, tagdat_input, peakpos, fragL = 100 )
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

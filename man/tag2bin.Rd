@@ -2,7 +2,7 @@
 \alias{tag2bin}
 \title{Convert the genome coordinates of aligned reads to bin-level counts for all chromosomes.}
 \usage{
-  tag2bin(tagdat, fragL = 200, binS = 200, prob = 1)
+tag2bin(tagdat, fragL = 200, binS = 200, prob = 1)
 }
 \arguments{
   \item{tagdat}{A \link{list} of the genome coordinates for
@@ -22,18 +22,17 @@
   data. Default: 1 (use all reads).}
 }
 \value{
-  A \link{list} of the bin-level counts for each
-  chromosome.
+A \link{list} of the bin-level counts for each chromosome.
 }
 \description{
-  Convert the genome coordinates of aligned reads to
-  bin-level counts for all chromosomes.
+Convert the genome coordinates of aligned reads to
+bin-level counts for all chromosomes.
 }
 \examples{
 data( tagdat_chip )
 tag2bin( tagdat_chip, fragL = 100, binS = 100 )
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

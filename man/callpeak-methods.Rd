@@ -3,6 +3,13 @@
 \alias{callpeak}
 \alias{callpeak,CSSPFit-method}
 \title{Call enriched bins based on the CSSP model.}
+\usage{
+callpeak(fit, chip, fold = 1.8, min.count = 0, qval = 0.05, method = "",
+  depth = fit@lambday)
+
+\S4method{callpeak}{CSSPFit}(fit, chip, fold = 1.8, min.count = 0,
+  qval = 0.05, method = "", depth = fit@lambday)
+}
 \arguments{
   \item{fit}{A \link{CSSPFit-class} object containing the
   fitted CSSP model.}
@@ -30,10 +37,10 @@
   posterior bin-level poisson intensities.}
 }
 \value{
-  A \link{numeric} vector of locations for binding bins.
+A \link{numeric} vector of locations for binding bins.
 }
 \description{
-  Call enriched bins based on the CSSP model.
+Call enriched bins based on the CSSP model.
 }
 \examples{
 data( sampleFit )
@@ -41,6 +48,6 @@ data( bin.data )
 callpeak( sampleFit, chip = bin.data@tagCount, fold = 1, min.count = 0 )
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

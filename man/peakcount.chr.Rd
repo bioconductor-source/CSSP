@@ -2,7 +2,7 @@
 \alias{peakcount.chr}
 \title{Compute the number of aligned reads overlapping peaks for one chromosome.}
 \usage{
-  peakcount.chr(tagdat, peakpos, fragL = 200)
+peakcount.chr(tagdat, peakpos, fragL = 200, unique = FALSE)
 }
 \arguments{
   \item{tagdat}{A \link{numeric} vector of the genome
@@ -17,14 +17,18 @@
 
   \item{fragL}{A \link{numeric} value for the fragment
   length of the sequencing reads. Default: 200.}
+
+  \item{unique}{A \link{logical} value for whether only
+  reads mapping to unique nucleotide positions are
+  counted.}
 }
 \value{
-  A \link{numeric} vector of the number of overlapping tags
-  for all peaks.
+A \link{numeric} vector of the number of overlapping tags
+for all peaks.
 }
 \description{
-  Compute the number of aligned reads overlapping peaks for
-  one chromosome.
+Compute the number of aligned reads overlapping peaks for
+one chromosome.
 }
 \examples{
 data( peakpos )
@@ -32,6 +36,6 @@ data( tagdat_input )
 peakcount.chr( tagdat_input[[1]], peakpos[[1]], fragL = 100 )
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

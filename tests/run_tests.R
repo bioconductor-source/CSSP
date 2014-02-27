@@ -6,7 +6,8 @@
 library( "testthat" )
 
 # convert all warnings to errors
-options( warn = 2 )
+options( warn = 1 )
 
 # run tests
-test_package( "CSSP" )
+# test_package( "CSSP" )
+test_check( "CSSP" )

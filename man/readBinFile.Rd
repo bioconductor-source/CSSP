@@ -2,8 +2,7 @@
 \alias{readBinFile}
 \title{Read the bin-level text files containing ChIP and input sample counts as well as M and GC scores.}
 \usage{
-  readBinFile(type = c("chip", "input", "M", "GC"),
-    fileName)
+readBinFile(type = c("chip", "input", "M", "GC"), fileName)
 }
 \arguments{
   \item{type}{A \link{character} vector indicating data
@@ -19,16 +18,16 @@
   appear in the same order.}
 }
 \value{
-  A \link{data.frame} of the processed bin files,
-  containing ChIP, input, M and GC in different columns.
+A \link{data.frame} of the processed bin files, containing
+ChIP, input, M and GC in different columns.
 }
 \description{
-  Read the bin-level text files containing ChIP and input
-  sample counts as well as M and GC scores.
+Read the bin-level text files containing ChIP and input
+sample counts as well as M and GC scores.
 }
 \note{
-  "chip","input" and "M" files are all mandatory. "GC" file
-  is optional.
+"chip","input" and "M" files are all mandatory. "GC" file
+is optional.
 }
 \examples{
 data( bindata.chr1 )
@@ -50,6 +49,6 @@ file.remove( paste( "chr1_", c( "chip", "input", "map", "gc" ), ".txt", sep = ""
 })
 }
 \author{
-  Chandler Zuo\email{zuo@stat.wisc.edu}
+Chandler Zuo\email{zuo@stat.wisc.edu}
 }
 

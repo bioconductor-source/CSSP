@@ -20,7 +20,7 @@
 #'@docType methods
 #'@rdname cssp.sim-methods
 setGeneric("cssp.sim",
-           function(fit,...)
+           function(fit,x=fit@lambday)
            standardGeneric("cssp.sim")
            )
 
@@ -46,6 +46,8 @@ setMethod("cssp.sim",
             }
             bind.sig <- apply(cbind(runif(n),fit@post.p.sig),1,.rmultinom)
             post.mean <- rgamma(n,shape=fit@post.shape.back,scale=fit@post.scale.back)*x/fit@lambday
+            infl.id <- rbinom(n, size = 1, prob = fit@post.p.zero / (1 - fit@post.p.bind ) )
+            post.mean[infl.id] <- 0
             for(i in seq_len(fit@k)){
               post.mean[bind.id*bind.sig==i] <- pois.mean[,i][bind.id*bind.sig==i]
             }
@@ -73,7 +75,7 @@ setMethod("cssp.sim",
 #'@docType methods
 #'@rdname callpeak-methods
 setGeneric("callpeak",
-           function(fit,...)
+           function(fit,chip,fold=1.8,min.count=0,qval=0.05,method="",depth=fit@lambday)
            standardGeneric("callpeak")
           )
 
@@ -83,15 +85,15 @@ setMethod("callpeak",
           signature="CSSPFit",
           definition=function(fit,chip,fold=1.8,min.count=0,qval=0.05,method="",depth=fit@lambday)
           {
-            pval <- pnbinom(chip[fit@map.id],mu=fit@mu.chip*depth/fit@lambday,size=fit@b,lower=F)
+            pval <- pnbinom(chip[fit@map.id],mu=fit@mu.chip*depth/fit@lambday,size=fit@b,lower.tail=F)*(1-fit@prob.zero)
             thr <- apply(cbind(fold*fit@mu.chip*depth/fit@lambday,min.count),1,max)
             if(method=="post")
               {
                 p <- matrix(0,nrow=fit@n,ncol=fit@k)
                 for(i in seq_len(fit@k)){
-                  p[,i] <- pgamma(thr,shape=fit@post.shape.sig[,i],scale=fit@post.scale.sig[,i]*depth/fit@lambday,lower=F)
+                  p[,i] <- pgamma(thr,shape=fit@post.shape.sig[,i],scale=fit@post.scale.sig[,i]*depth/fit@lambday,lower.tail=F)
                 }
-#                p0 <- pgamma(thr,shape=fit@post.shape.back,scale=fit@post.scale.back*depth/fit@lambday,lower=F)
+#                p0 <- pgamma(thr,shape=fit@post.shape.back,scale=fit@post.scale.back*depth/fit@lambday,lower.tail=F)
                                         #            p.thr <- fit@post.p.bind*(fit@post.p.sig1*p1+fit@post.p.sig2*p2)+(1-fit@post.p.bind)*p0
                 p.thr <- fit@post.p.sig%*%p
                 return(fit@map.id[which(pval*fit@n/rank(pval)<=qval & p.thr>0.5)])
@@ -120,7 +122,7 @@ setMethod("callpeak",
 #'@docType methods
 #'@rdname fit.freq-methods
 setGeneric("fit.freq",
-           function(fit,...)
+           function(fit,chip)
            standardGeneric("fit.freq")
           )
 
@@ -132,20 +134,73 @@ setMethod("fit.freq",
           {
             if(length(chip)<fit@n)
               stop("chip must have length at least fit@n")
-            freq.chip <- matrix( 0, nrow = as.integer( quantile( chip, 0.99 ) ), ncol = 3 )
-            for(i in ( seq_len(quantile(chip,0.99) )-1) )
+
+            if( fit@n > 1000 )
+              sub.ind <- sample( seq_len( fit@n ), 1000 )
+            else
+                sub.ind <- seq_len( fit@n )
+            
+            max.count <- as.integer( quantile( chip[sub.ind], 0.95 ) )
+            freq.chip <- matrix( 0, nrow = as.integer( max.count + 1 ), ncol = 3 )
+            
+            dnbinom.sig <- as.list( seq_len( fit@k ) )
+            for( j in seq_len( fit@k ) ){
+              dnbinom.sig[[ j ]] <- t(
+                                      apply(
+                                            cbind( fit@post.shape.sig[sub.ind,j],
+                                                  fit@post.scale.sig[sub.ind,j] ),
+                                            1,
+                                            function( x )
+                                            dnbinom( seq_len( max.count + 1 ) - 1,
+                                                    size = x[1],
+                                                    mu = x[1] * x[2]
+                                                    )
+                                            )
+                                      )
+            }
+
+            dnbinom.back <- t( apply(
+                                     cbind(
+                                           fit@post.shape.back[sub.ind],
+                                           fit@post.scale.back[sub.ind]
+                                           ),
+                                     1,
+                                     function( x)
+                                     dnbinom( seq_len( max.count + 1 ) - 1,
+                                             size = x[1],
+                                             mu = x[1] * x[2]
+                                             )
+                                     )
+                              )
+            
+            for(i in ( seq_len( max.count + 1 ) - 1) )
               {
-                post.dnbinom <- rep(0,fit@n)
+                post.dnbinom <- rep(0,length( sub.ind ))
                 for(j in seq_len(fit@k)){
-                  post.dnbinom <- post.dnbinom +fit@post.p.sig[,j]*dnbinom(i,size=fit@post.shape.sig[,j],mu=fit@post.scale.sig[,j]*fit@post.shape.sig[,j])
+                  post.dnbinom <- post.dnbinom +fit@post.p.sig[sub.ind,j]*dnbinom.sig[[j]][,i + 1]
                 }
-                freq.chip[i,] <- c(i,
-                                   sum(chip[fit@map.id]==i),
-                                   sum(
-                                       dnbinom(i,size=fit@post.shape.back,mu=fit@post.shape.back*fit@post.scale.back)*(1-fit@post.p.bind)+fit@post.p.bind*post.dnbinom  )
-                                   )
+                if( i == 0 ){
+                  freq.chip[i+1,] <- c(i,
+                                     sum(chip[fit@map.id[sub.ind]]==i),
+                                     sum(
+                                         dnbinom.back[,i+1]*(1-fit@post.p.bind[sub.ind]-fit@post.p.zero[sub.ind]) +
+                                         fit@post.p.bind[sub.ind]*post.dnbinom +
+                                         fit@post.p.zero[sub.ind]
+                                         )
+                                     )
+                } else {
+                  freq.chip[i+1,] <- c(i,
+                                     sum(chip[fit@map.id[sub.ind]]==i),
+                                     sum(
+                                         dnbinom.back[,i+1]*(1-fit@post.p.bind[sub.ind]-fit@post.p.zero[sub.ind]) +
+                                         fit@post.p.bind[sub.ind]*post.dnbinom
+                                         )
+                                     )
+                }
               }
             freq.chip <- data.frame(freq.chip)
+            freq.chip[ ,2] <-  freq.chip[ , 2 ]/ sum( freq.chip[,2] )
+            freq.chip[,3] <- freq.chip[,3]/sum( freq.chip[,3] )
             names(freq.chip) <- c("count","freq","freq.est")
             return(freq.chip)
           })
@@ -166,7 +221,7 @@ setMethod("fit.freq",
 #'@docType methods
 #'@rdname qBBT-methods
 setGeneric("qBBT",
-           function(fit,...)
+           function(fit,prob,depth=fit@lambday,lower=FALSE)
            standardGeneric("qBBT")
           )
 
@@ -207,7 +262,7 @@ setMethod("qBBT",
 #'@docType methods
 #'@rdname pBBT-methods
 setGeneric("pBBT",
-           function(fit,...)
+           function(fit,x,depth=fit@lambday,lower=TRUE)
            standardGeneric("pBBT")
           )
 
@@ -221,7 +276,7 @@ setMethod("pBBT",
             for(i in seq_len(fit@k)){
               post.pgamma <- post.pgamma + pgamma(x,shape=fit@post.shape.sig[,i],scale=fit@post.scale.sig[,i]*depth/fit@lambday)*fit@post.p.sig[,i]*fit@post.p.bind
             }
-            prob <- mean(pgamma(x,shape=fit@post.shape.back,scale=fit@post.scale.back*depth/fit@lambday)*(1-fit@post.p.bind)+post.pgamma)
+            prob <- mean(pgamma(x,shape=fit@post.shape.back,scale=fit@post.scale.back*depth/fit@lambday)*(1-fit@post.p.bind-fit@post.p.zero)+fit@post.p.zero+post.pgamma)
 
             if(!lower) prob <- 1-prob
             return(prob)

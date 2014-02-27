@@ -170,6 +170,14 @@ The sample data-set in our package is in no way comaprable with the real data-se
 sampleFit.grid <- cssp.fit( bindata1, useGrid = TRUE, nsize = 500 )
 @ 
 
+In the current version of \texttt{CSSP}, two additional arguments are provided to support different practical settings. First, ``nonpa'' (default: FALSE) specifies whether a nonparametric model is used instead of a GLM to fit the input data. Second, ``zeroinfl'' (default: FALSE) specifies whether a zero-inflated model is fitted for the ChIP sample. A zero-inflated model is particularly useful for data with low sequencing depth and thus having lots of zero-count bins.
+
+<<eval=FALSE,echo=TRUE,results=verbatim,cache=FALSE>>=
+sampleFit.np <- cssp.fit( bindata1, nonpa = TRUE )
+
+sampleFit.zi <- cssp.fit( bindata1, nonpa = TRUE, zeroinfl = TRUE )
+@ 
+
 An alternative method is to use the \textit{generalized EM method} described in \cite{zuo12} by specifying the ``method='gem'"  argument. In \cite{zuo12}, we notice that although this method is less time consuming than MDE, its model estimate is not robust in many practical settings. Therefore, in our package, we provide this method for exploratory purposes only.
 
 <<5,eval=FALSE,echo=TRUE,results=verbatim,cache=TRUE>>=
@@ -298,8 +306,6 @@ For example, we may compute the power for our example data at 10\% of its curren
 cssp.power( fit = sampleFit, x = sampleFit@lambday*0.1, ite = 5,
            fold = 2, min.count = fit.tail2, useC = TRUE )
 @ 
-
-
 
 \subsection{Supplementary Functions}
 

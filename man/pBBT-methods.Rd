@@ -3,6 +3,11 @@
 \alias{pBBT}
 \alias{pBBT,CSSPFit-method}
 \title{Compute the cumulative probability of the bin-level poisson parameters.}
+\usage{
+pBBT(fit, x, depth = fit@lambday, lower = TRUE)
+
+\S4method{pBBT}{CSSPFit}(fit, x, depth = fit@lambday, lower = TRUE)
+}
 \arguments{
   \item{fit}{A \link{CSSPFit-class} object for the CSSP
   model.}
@@ -18,18 +23,18 @@
   quantile is computed.}
 }
 \value{
-  A \link{numeric} value for the cumulative distribution of
-  bin-level poisson parameters.
+A \link{numeric} value for the cumulative distribution of
+bin-level poisson parameters.
 }
 \description{
-  Compute the cumulative probability of the bin-level
-  poisson parameters.
+Compute the cumulative probability of the bin-level poisson
+parameters.
 }
 \examples{
 data( sampleFit )
 pBBT( sampleFit, x = 10 )
 }
 \author{
-  Chandler Zuo \email{zuo@stat.wisc.edu}
+Chandler Zuo \email{zuo@stat.wisc.edu}
 }
 

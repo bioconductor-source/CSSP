@@ -3,7 +3,7 @@
 #include <Rmath.h>
 #include <time.h>
 
-SEXP gridMGCmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
+SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 {
 
   double *M=REAL(map),*GC=REAL(gc), *Y=REAL(y);
@@ -156,7 +156,7 @@ SEXP gridMGCmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 	{
 	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i] & GC[j]>GCgrid_l[i] & GC[j]<=GCgrid_u[i])
 	    {
-		    REAL(res)[1+4*i]+=Y[j];
+		    REAL(res)[1+4*i]+=log(Y[j]+1);
 	      REAL(res)[2+4*i]+=M[j];
 	      REAL(res)[3+4*i]+=GC[j];
 	    }
@@ -171,7 +171,7 @@ SEXP gridMGCmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 
 }
 
-SEXP gridMmean_c(SEXP y, SEXP map,SEXP ngrid)
+SEXP gridMlogmean_c(SEXP y, SEXP map,SEXP ngrid)
 {
   double *M=REAL(map), *Y=REAL(y);
   R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[2],n=length(map),newG,counter;
@@ -294,7 +294,7 @@ SEXP gridMmean_c(SEXP y, SEXP map,SEXP ngrid)
 	{
 	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i])
 	    {
-		    REAL(res)[1+3*i]+=Y[j];
+		    REAL(res)[1+3*i]+=log(Y[j]+1);
 	      REAL(res)[2+3*i]+=M[j];
 	    }
 	}
