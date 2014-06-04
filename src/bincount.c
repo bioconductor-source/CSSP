@@ -70,11 +70,20 @@ SEXP peakcount_c(SEXP tagCoord,SEXP peakPos1, SEXP peakPos2, SEXP fragLen)
 SEXP peakcount_uniq(SEXP tagCoord,SEXP peakPos1, SEXP peakPos2, SEXP fragLen)
 {
 	double *coord=REAL(tagCoord), *pos1=REAL(peakPos1), *pos2=REAL(peakPos2), fragL=REAL(fragLen)[0];
-	R_len_t n=length(peakPos1),m=length(tagCoord),i,j,start,end;
+	R_len_t n=length(peakPos1),m=length(tagCoord),i,j,start,end,maxpeaklen;
 	SEXP posCount, read1, read2;
 	PROTECT(posCount=allocVector(REALSXP,n));
-	PROTECT(read1=allocVector(REALSXP,pos2[0] - pos1[0] + fragL + 1 ) );
-	PROTECT(read2=allocVector(REALSXP,pos2[0] - pos1[0] + fragL + 1 ) );
+	
+	// fixed a bug for non-equal length peaks
+	maxpeaklen = pos2[0] - pos1[0];
+	for(i = 0; i < n; i ++) {
+		if(maxpeaklen < pos2[i] - pos1[i]) {
+			maxpeaklen = pos2[i] - pos1[i];
+		}
+	}
+
+	PROTECT(read1=allocVector(REALSXP,maxpeaklen + fragL + 1 ) );
+	PROTECT(read2=allocVector(REALSXP,maxpeaklen + fragL + 1 ) );
 	
 	for(i=0;i<n;i++)   {
 		REAL(posCount)[i]=0;
