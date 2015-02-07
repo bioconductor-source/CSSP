@@ -24,7 +24,7 @@ SEXP bindcount_c(SEXP tagCoord,SEXP bindPos, SEXP fragLen, SEXP whs)
 	    start=coord[j];
 	    end=coord[j]+fragL-1;
 	  }
-	  if(pos[i]+wsize>=start && pos[i]-wsize<=end)
+	  if((pos[i]+wsize>=start) && (pos[i]-wsize<=end))
 	    {
 	      REAL(posCount)[i]++;
 	    }
@@ -56,7 +56,7 @@ SEXP peakcount_c(SEXP tagCoord,SEXP peakPos1, SEXP peakPos2, SEXP fragLen)
 	    start=coord[j];
 	    end=coord[j]+fragL-1;
 	  }
-	  if(pos2[i]>=start && pos1[i]<=end)
+	  if((pos2[i]>=start) && (pos1[i]<=end))
 	    {
 	      REAL(posCount)[i]++;
 	    }
@@ -97,7 +97,7 @@ SEXP peakcount_uniq(SEXP tagCoord,SEXP peakPos1, SEXP peakPos2, SEXP fragLen)
 			  if(start<0) start=0;
 			  end=-coord[j];
 			  int id = (int)(start - pos1[i] + fragL);
-			  if(pos2[i]>=start && pos1[i]<=end && REAL(read1)[ id ]==0 )	  {
+			  if((pos2[i]>=start) && (pos1[i]<=end) && (REAL(read1)[ id ]==0))	  {
 				  REAL(read1)[id]++;
 				  REAL(posCount)[i]++;
 			  }
@@ -105,7 +105,7 @@ SEXP peakcount_uniq(SEXP tagCoord,SEXP peakPos1, SEXP peakPos2, SEXP fragLen)
 				start=coord[j];
 				end=coord[j]+fragL-1;
 				int id = (int)(start - pos1[i] + fragL);
-				if(pos2[i]>=start && pos1[i]<=end && REAL(read2)[ id ]==0 )	  {
+				if((pos2[i]>=start) && (pos1[i]<=end) && (REAL(read2)[ id ]==0) )	  {
 					REAL(read2)[id]++;
 					REAL(posCount)[i]++;
 				}

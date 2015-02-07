@@ -28,13 +28,13 @@ SEXP gridMGCmode_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
       //find the grid with maximum number of points and which is breakable
       //Rprintf("=====Find the maximum grid=====\n");
       l=0;
-      while(((Mgrid_u[l]<=Mgrid_l[l]+0.01 & GCgrid_u[l]>GCgrid_l[l]+0.01) | Mgrid_u[l]+Mgrid_l[l]<0 | GCgrid_u[l]+GCgrid_l[l]<0 )&l<k-1)
+      while(((Mgrid_u[l]<=Mgrid_l[l]+0.01 && GCgrid_u[l]>GCgrid_l[l]+0.01) || Mgrid_u[l]+Mgrid_l[l]<0 || GCgrid_u[l]+GCgrid_l[l]<0 )&&l<k-1)
 	{
 	  l++;
 	}
       for( i=l+1;i<k;i++)
 	{
-	  if(Ngrid[i]>Ngrid[l] & (Mgrid_u[i]>Mgrid_l[i]+0.01 | GCgrid_u[i]>GCgrid_l[i]+0.01) & Mgrid_u[l]+Mgrid_l[l]>0 & GCgrid_u[l]+GCgrid_l[l]>0)
+	  if(Ngrid[i]>Ngrid[l] && (Mgrid_u[i]>Mgrid_l[i]+0.01 || GCgrid_u[i]>GCgrid_l[i]+0.01) && Mgrid_u[l]+Mgrid_l[l]>0 && GCgrid_u[l]+GCgrid_l[l]>0)
 	    {
 	      l=i;
 	    }
@@ -42,9 +42,9 @@ SEXP gridMGCmode_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 	}
       //Rprintf("Maximum grid identified at\t%d\t with count %lf\n",l,Ngrid[l]);
       //Check if breaking this grid is possible
-      if(Mgrid_u[l]<=Mgrid_l[l]+0.01 & GCgrid_u[l]<=GCgrid_l[l]+0.01)
+      if(Mgrid_u[l]<=Mgrid_l[l]+0.01 && GCgrid_u[l]<=GCgrid_l[l]+0.01)
 	break;
-      if(Mgrid_u[l]+Mgrid_l[l]<=0 |GCgrid_u[l]+GCgrid_l[l]<=0)
+      if(Mgrid_u[l]+Mgrid_l[l]<=0 ||GCgrid_u[l]+GCgrid_l[l]<=0)
 	break;
       if(Ngrid[l]<=10)
 	break;
@@ -76,7 +76,7 @@ SEXP gridMGCmode_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 	  Ngrid[i]=0;
 	  for(j=0;j<n;j++)
 	    {
-	      if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i] & GC[j]>GCgrid_l[i] & GC[j]<=GCgrid_u[i])
+	      if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i] && GC[j]>GCgrid_l[i] && GC[j]<=GCgrid_u[i])
 		{
 		  Ngrid[i]=Ngrid[i]+1;
 		}
@@ -161,7 +161,7 @@ SEXP gridMGCmode_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
       counter = -1;
       for(j=0;j<n;j++)
 	{
-	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i] & GC[j]>GCgrid_l[i] & GC[j]<=GCgrid_u[i])
+	  if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i] && GC[j]>GCgrid_l[i] && GC[j]<=GCgrid_u[i])
 	    {
 
 		    for( l = 0; l <= counter; l ++ ){
@@ -216,13 +216,13 @@ SEXP gridMmode_c(SEXP y, SEXP map,SEXP ngrid)
       //find the grid with maximum number of points and which is breakable
       //Rprintf("=====Find the maximum grid=====\n");
       l=0;
-      while((Mgrid_u[l]<=Mgrid_l[l]+0.001 | Mgrid_u[l]+Mgrid_l[l]<0)&l<k-1)
+      while((Mgrid_u[l]<=Mgrid_l[l]+0.001 || Mgrid_u[l]+Mgrid_l[l]<0)&&l<k-1)
 	{
 	  l++;
 	}
       for( i=l+1;i<k;i++)
 	{
-	  if(Ngrid[i]>Ngrid[l] & Mgrid_u[i]>Mgrid_l[i]+0.001 & Mgrid_u[i]+Mgrid_l[i]>0)
+	  if(Ngrid[i]>Ngrid[l] && Mgrid_u[i]>Mgrid_l[i]+0.001 && Mgrid_u[i]+Mgrid_l[i]>0)
 	    {
 	      l=i;
 	    }
@@ -248,7 +248,7 @@ SEXP gridMmode_c(SEXP y, SEXP map,SEXP ngrid)
       Ngrid[k]=0;
       for(j=0;j<n;j++)
 	{
-	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i])
+	  if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i])
 	    {
 	      Ngrid[k]=Ngrid[k]+1;
 	    }
@@ -323,7 +323,7 @@ SEXP gridMmode_c(SEXP y, SEXP map,SEXP ngrid)
       counter = -1;
       for(j=0;j<n;j++)
 	{
-	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i])
+	  if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i])
 	    {
 		    for( l = 0; l <= counter; l ++ ){
 			    if( Y[j] == REAL( cnt )[l] ){

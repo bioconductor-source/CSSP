@@ -16,6 +16,7 @@
 #'@param ncomp A \link{numeric} value for the number of signal components.
 #'@param nonpa A \link{logical} value indicating whether a nonparametric model for the background ChIP sample and the input sample is fitted.
 #'@param zeroinfl A \link{logical} value indicating whether a zero-inflated negative binomial model is fitted for the ChIP background.
+#'@param seed A \link{numeric} value for the seed of generating random variables. Default: NULL. Users should specify this value for generating exactly reproducible results.
 #'@details The current version of cssp.fit has implemented the following method.\cr
 #'The "method" argument specifies the method to estimate the normalization models for the ChIP background from the input data. "mde" uses minimum distance estimation, "gem" uses generalized E-M estimation.\cr
 #'The 'nonpa' argument specifies whether a glm model is used. If "nonpa" is FALSE, a GLM is used to fit the input data. If "nonpa" is TRUE, the mean response within each grid is taken as the predict. These two arguments enables the analysis for genome-wide data. In this case, "nsize" grids are used.\cr
@@ -35,7 +36,7 @@
 #'@rdname cssp.fit-methods
 #'@export
 setGeneric("cssp.fit",
-           function(dat,method="mde",p1=0.5,p2=0.99,beta.init=NULL,e0.init=0.90,e0.lb=0.5,ngc=9,nite=50,tol=0.01,useGrid=FALSE,nsize=NULL,ncomp=2,nonpa=FALSE,zeroinfl=FALSE)
+           function(dat,method="mde",p1=0.5,p2=0.99,beta.init=NULL,e0.init=0.90,e0.lb=0.5,ngc=9,nite=50,tol=0.01,useGrid=FALSE,nsize=NULL,ncomp=2,nonpa=FALSE,zeroinfl=FALSE,seed=NULL)
            standardGeneric("cssp.fit")
           )
 
@@ -44,7 +45,7 @@ setGeneric("cssp.fit",
 #'@aliases cssp.fit,data.frame-method
 setMethod("cssp.fit",
           signature="data.frame",
-          definition=function(dat,method="mde",p1=0.5,p2=0.99,beta.init=NULL,e0.init=0.90,e0.lb=0.5,ngc=9,nite=50,tol=0.01,useGrid=FALSE,nsize=NULL,ncomp=2,nonpa=FALSE,zeroinfl=FALSE)
+          definition=function(dat,method="mde",p1=0.5,p2=0.99,beta.init=NULL,e0.init=0.90,e0.lb=0.5,ngc=9,nite=50,tol=0.01,useGrid=FALSE,nsize=NULL,ncomp=2,nonpa=FALSE,zeroinfl=FALSE,seed=NULL)
           {
             if(prod(c("chip","input","M")%in%names(dat))==0)
               stop("Error: data.frame must contain chip, input and M columns")
@@ -75,7 +76,7 @@ setMethod("cssp.fit",
                 gc <- NULL
               }
             map <- dat$M[map.id]
-            return(.csspfit(sam.chip,sam.input,map,gc,method,p1,p2,beta.init,e0.init,e0.lb,ngc,nite,tol,m,map.id,useGrid,nsize,ncomp,nonpa,zeroinfl))
+            return(.csspfit(sam.chip,sam.input,map,gc,method,p1,p2,beta.init,e0.init,e0.lb,ngc,nite,tol,m,map.id,useGrid,nsize,ncomp,nonpa,zeroinfl,seed))
           }
           )
 
@@ -84,7 +85,7 @@ setMethod("cssp.fit",
 #'@aliases cssp.fit,BinData-method
 setMethod("cssp.fit",
           signature="BinData",
-          definition=function(dat,method="mde",p1=0.5,p2=0.99,beta.init=NULL,e0.init=0.90,e0.lb=0.5,ngc=9,nite=50,tol=0.01,useGrid=FALSE,nsize=NULL,ncomp=2,nonpa=FALSE,zeroinfl=FALSE)
+          definition=function(dat,method="mde",p1=0.5,p2=0.99,beta.init=NULL,e0.init=0.90,e0.lb=0.5,ngc=9,nite=50,tol=0.01,useGrid=FALSE,nsize=NULL,ncomp=2,nonpa=FALSE,zeroinfl=FALSE,seed=NULL)
           {
             if(length(dat@mappability)==0) 
               stop("Error: mappability is missing")
@@ -115,12 +116,15 @@ setMethod("cssp.fit",
             gc <- NULL
             if(length(dat@gcContent)>0) gc <- dat@gcContent[map.id]
             map <- dat@mappability[map.id]
-            return(.csspfit(sam.chip,sam.input,map,gc,method,p1,p2,beta.init,e0.init,e0.lb,ngc,nite,tol,m,map.id,useGrid,nsize,ncomp,nonpa,zeroinfl))
+            return(.csspfit(sam.chip,sam.input,map,gc,method,p1,p2,beta.init,e0.init,e0.lb,ngc,nite,tol,m,map.id,useGrid,nsize,ncomp,nonpa,zeroinfl,seed))
           }
           )
 
-.csspfit <- function(sam.chip,sam.input,map,gc,method,p1,p2,beta.init,e0.init,e0.lb,ngc,nite,tol,m,map.id,useGrid,nsize,ncomp,nonpa,zeroinfl)
+.csspfit <- function(sam.chip,sam.input,map,gc,method,p1,p2,beta.init,e0.init,e0.lb,ngc,nite,tol,m,map.id,useGrid,nsize,ncomp,nonpa,zeroinfl,seed)
   {
+      if(is.null(seed))
+          seed <- Sys.time()
+      set.seed(seed)
     n <- length(sam.chip)
     if( is.null( nsize ) ) nsize <- n
 

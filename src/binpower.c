@@ -53,7 +53,7 @@ SEXP binpower (SEXP size_back, SEXP scale_back, SEXP size_sig, SEXP scale_sig, S
   
   //compute FDR a
   
-  double sim_bin[n],tmpcount,tmp,tmprate,p_thre,ptail_sig[ncomp],rej_back,binpow;
+  double sim_bin[n],tmpcount,tmp,tmprate,p_thre=0,ptail_sig[ncomp],rej_back,binpow;
   SEXP wei_pow;
   PROTECT(wei_pow=allocVector(REALSXP,1));
   
@@ -69,7 +69,7 @@ SEXP binpower (SEXP size_back, SEXP scale_back, SEXP size_sig, SEXP scale_sig, S
 	tmp=0;
 	s=0;
 	xx=runif(0,1);
-	while(xx>=s & tmp<ncomp){
+	while(xx>=s && tmp<ncomp){
 	  s+=rprob_sig[j+(int)tmp*n];
 	  tmp++;
 	}
@@ -102,7 +102,7 @@ SEXP binpower (SEXP size_back, SEXP scale_back, SEXP size_sig, SEXP scale_sig, S
 	tmp=0;
 	xx=runif(0,1);
 	s=0;
-	while(s<=xx & tmp<ncomp){
+	while(s<=xx && tmp<ncomp){
 	  s+=rprob_sig[i+(int)tmp*n];
 	  tmp++;
 	}
@@ -132,13 +132,14 @@ SEXP binpower (SEXP size_back, SEXP scale_back, SEXP size_sig, SEXP scale_sig, S
 
 SEXP binpower_pval (SEXP size_back, SEXP scale_back, SEXP size_sig,SEXP scale_sig, SEXP prob_bind, SEXP prob_sig,SEXP ite, SEXP fold, SEXP min_count, SEXP beta, SEXP mu_chip, SEXP p_val, SEXP prob_zero)
 {
-  R_len_t n= length(mu_chip),i,j,k,isig,nite=REAL(ite)[0],ncomp=length(size_sig)/length(mu_chip);
-  double *rsize_back=REAL(size_back), *rscale_back=REAL(scale_back), *rscale_sig=REAL(scale_sig), *rsize_sig=REAL(size_sig), *rprob_bind=REAL(prob_bind), *rprob_sig=REAL(prob_sig), *rprob_zero=REAL(prob_zero);
+  R_len_t n= length(mu_chip),i,j,isig,nite=REAL(ite)[0],ncomp=length(size_sig)/length(mu_chip);
+  double *rscale_sig=REAL(scale_sig), *rsize_sig=REAL(size_sig), *rprob_bind=REAL(prob_bind), *rprob_sig=REAL(prob_sig), *rprob_zero=REAL(prob_zero);
+  //  double *rsize_back=REAL(size_back), *rscale_back=REAL(scale_back);
   double rbeta=REAL(beta)[0], *rmu_chip=REAL(mu_chip), rfold=REAL(fold)[0], rmin_count=REAL(min_count)[0], p_thre=REAL(p_val)[0];
   double s,xx;
   //compute FDR a
   
-  double sim_bin[n],tmpcount,tmp,tmprate,ptail_sig[ncomp],rej_back,binpow;
+  double tmpcount,tmprate,ptail_sig[ncomp],rej_back,binpow;
   SEXP wei_pow,p_tail;
   PROTECT(wei_pow=allocVector(REALSXP,1));
   PROTECT(p_tail=allocVector(REALSXP,n));
@@ -159,7 +160,7 @@ SEXP binpower_pval (SEXP size_back, SEXP scale_back, SEXP size_sig,SEXP scale_si
       xx=runif(0,1);
       s=0;
       isig=0;
-      while(s<=xx & isig<ncomp){
+      while(s<=xx && isig<ncomp){
 	s+=rprob_sig[i+isig*n];
 	isig++;
       }

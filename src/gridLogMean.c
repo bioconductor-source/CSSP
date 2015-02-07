@@ -7,7 +7,7 @@ SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 {
 
   double *M=REAL(map),*GC=REAL(gc), *Y=REAL(y);
-  R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[4],n=length(map),newG,counter;
+  R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[4],n=length(map),newG;//counter;
 
   double Mgrid_l[ng+10],GCgrid_l[ng+10],Ngrid[ng+10],Mgrid_u[ng+10],GCgrid_u[ng+10];
   SEXP res;
@@ -26,13 +26,13 @@ SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
       //find the grid with maximum number of points and which is breakable
       //Rprintf("=====Find the maximum grid=====\n");
       l=0;
-      while(((Mgrid_u[l]<=Mgrid_l[l]+0.01 & GCgrid_u[l]>GCgrid_l[l]+0.01) | Mgrid_u[l]+Mgrid_l[l]<0 | GCgrid_u[l]+GCgrid_l[l]<0 )&l<k-1)
+      while(((Mgrid_u[l]<=Mgrid_l[l]+0.01 && GCgrid_u[l]>GCgrid_l[l]+0.01) || Mgrid_u[l]+Mgrid_l[l]<0 || GCgrid_u[l]+GCgrid_l[l]<0 )&&l<k-1)
 	{
 	  l++;
 	}
       for( i=l+1;i<k;i++)
 	{
-	  if(Ngrid[i]>Ngrid[l] & (Mgrid_u[i]>Mgrid_l[i]+0.01 | GCgrid_u[i]>GCgrid_l[i]+0.01) & Mgrid_u[l]+Mgrid_l[l]>0 & GCgrid_u[l]+GCgrid_l[l]>0)
+	  if(Ngrid[i]>Ngrid[l] && (Mgrid_u[i]>Mgrid_l[i]+0.01 || GCgrid_u[i]>GCgrid_l[i]+0.01) && Mgrid_u[l]+Mgrid_l[l]>0 && GCgrid_u[l]+GCgrid_l[l]>0)
 	    {
 	      l=i;
 	    }
@@ -40,9 +40,9 @@ SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 	}
       //Rprintf("Maximum grid identified at\t%d\t with count %lf\n",l,Ngrid[l]);
       //Check if breaking this grid is possible
-      if(Mgrid_u[l]<=Mgrid_l[l]+0.01 & GCgrid_u[l]<=GCgrid_l[l]+0.01)
+      if(Mgrid_u[l]<=Mgrid_l[l]+0.01 && GCgrid_u[l]<=GCgrid_l[l]+0.01)
 	break;
-      if(Mgrid_u[l]+Mgrid_l[l]<=0 |GCgrid_u[l]+GCgrid_l[l]<=0)
+      if(Mgrid_u[l]+Mgrid_l[l]<=0 ||GCgrid_u[l]+GCgrid_l[l]<=0)
 	break;
       if(Ngrid[l]<=10)
 	break;
@@ -74,7 +74,7 @@ SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 	  Ngrid[i]=0;
 	  for(j=0;j<n;j++)
 	    {
-	      if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i] & GC[j]>GCgrid_l[i] & GC[j]<=GCgrid_u[i])
+	      if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i] && GC[j]>GCgrid_l[i] && GC[j]<=GCgrid_u[i])
 		{
 		  Ngrid[i]=Ngrid[i]+1;
 		}
@@ -154,7 +154,7 @@ SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
       REAL(res)[4+4*i]=Ngrid[i];
       for(j=0;j<n;j++)
 	{
-	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i] & GC[j]>GCgrid_l[i] & GC[j]<=GCgrid_u[i])
+	  if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i] && GC[j]>GCgrid_l[i] && GC[j]<=GCgrid_u[i])
 	    {
 		    REAL(res)[1+4*i]+=log(Y[j]+1);
 	      REAL(res)[2+4*i]+=M[j];
@@ -174,7 +174,7 @@ SEXP gridMGClogmean_c(SEXP y,SEXP map, SEXP gc,SEXP ngrid)
 SEXP gridMlogmean_c(SEXP y, SEXP map,SEXP ngrid)
 {
   double *M=REAL(map), *Y=REAL(y);
-  R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[2],n=length(map),newG,counter;
+  R_len_t ng=REAL(ngrid)[0],k,i,j,l,ind[2],n=length(map),newG;//counter;
   
   double Mgrid_l[ng+10],Ngrid[ng+10],Mgrid_u[ng+10];
   SEXP res;
@@ -190,13 +190,13 @@ SEXP gridMlogmean_c(SEXP y, SEXP map,SEXP ngrid)
       //find the grid with maximum number of points and which is breakable
       //Rprintf("=====Find the maximum grid=====\n");
       l=0;
-      while((Mgrid_u[l]<=Mgrid_l[l]+0.001 | Mgrid_u[l]+Mgrid_l[l]<0)&l<k-1)
+      while((Mgrid_u[l]<=Mgrid_l[l]+0.001 || Mgrid_u[l]+Mgrid_l[l]<0)&&l<k-1)
 	{
 	  l++;
 	}
       for( i=l+1;i<k;i++)
 	{
-	  if(Ngrid[i]>Ngrid[l] & Mgrid_u[i]>Mgrid_l[i]+0.001 & Mgrid_u[i]+Mgrid_l[i]>0)
+	  if(Ngrid[i]>Ngrid[l] && Mgrid_u[i]>Mgrid_l[i]+0.001 && Mgrid_u[i]+Mgrid_l[i]>0)
 	    {
 	      l=i;
 	    }
@@ -222,7 +222,7 @@ SEXP gridMlogmean_c(SEXP y, SEXP map,SEXP ngrid)
       Ngrid[k]=0;
       for(j=0;j<n;j++)
 	{
-	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i])
+	  if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i])
 	    {
 	      Ngrid[k]=Ngrid[k]+1;
 	    }
@@ -292,7 +292,7 @@ SEXP gridMlogmean_c(SEXP y, SEXP map,SEXP ngrid)
       REAL(res)[3+3*i]=Ngrid[i];
       for(j=0;j<n;j++)
 	{
-	  if(M[j]>Mgrid_l[i] & M[j]<=Mgrid_u[i])
+	  if(M[j]>Mgrid_l[i] && M[j]<=Mgrid_u[i])
 	    {
 		    REAL(res)[1+3*i]+=log(Y[j]+1);
 	      REAL(res)[2+3*i]+=M[j];

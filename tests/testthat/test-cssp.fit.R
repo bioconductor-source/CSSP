@@ -23,8 +23,8 @@ test_that( "Function cssp.fit: check the data.frame and BinData data formats are
                    gcContent = bindata.chr1[,5],
                    coord = bindata.chr1[,1])
 
-  fit1 <- cssp.fit(bindata.1)
-  fit2 <- cssp.fit(bindata.chr1)
+  fit1 <- cssp.fit(bindata.1,seed=0)
+  fit2 <- cssp.fit(bindata.chr1,seed=0)
 
   expect_equal(fit1@a,fit2@a)
   expect_equal(fit1@mu.input,fit2@mu.input)
