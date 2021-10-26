@@ -1,7 +1,7 @@
 Package: CSSP
 Type: Package
 Title: ChIP-Seq Statistical Power
-Version: 1.31.0
+Version: 1.32.0
 Date: 2015-02-07
 Author: Chandler Zuo, Sunduz Keles
 Maintainer: Chandler Zuo<zuo@stat.wisc.edu>
