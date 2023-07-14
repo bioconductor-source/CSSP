@@ -1,7 +1,7 @@
 Package: CSSP
 Type: Package
 Title: ChIP-Seq Statistical Power
-Version: 1.39.0
+Version: 1.39.1
 Date: 2015-02-07
 Author: Chandler Zuo, Sunduz Keles
 Maintainer: Chandler Zuo<zuo@stat.wisc.edu>
@@ -12,3 +12,4 @@ Imports: methods, splines, stats, utils
 Suggests: testthat
 Packaged: 2013-04-06 18:12:54 UTC; zuo
 biocViews: ChIPSeq, Sequencing, QualityControl, Bayesian
+PackageStatus: Deprecated
